@@ -1,0 +1,38 @@
+version: 3
+
+
+# Task File to Build?
+tasks:
+  default:
+    cmds:
+      - echo "Use 'build' for the regular build 'debug' for debug build"
+    silent: true
+
+  build:
+    cmds:
+      - odin build . -o:speed
+    silent: true
+
+  debug:
+    cmds:
+      - odin build . -o:none -debug
+      - ./getopts --tester --vals 1 -w "Some stuff here" --blue=Steve --red=Help
+    aliases:
+      - d
+    sources:
+      - ./*.odin 
+    generates:
+      - getopts
+    silent: true
+  
+  test:
+    cmds:
+      - odin test .
+    aliases:
+      - t 
+    sources:
+      - ./*.odin 
+    silent: true
+
+
+interval: 1000ms 

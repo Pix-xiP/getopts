@@ -29,21 +29,22 @@ defer deinit_opts(&opts)
   using optarg_opt
   add_arg(&opts, "flag", .NO_ARGUMENT)
   add_arg(&opts, "opt-argument", .OPTIONAL_ARGUMENT)
-  add_arg(&opts, "reuqired", .REQUIRED_ARGUMENT)
+  add_arg(&opts, "required", .REQUIRED_ARGUMENT)
+  add_arg(&opts, "h", .NO_ARGUMENT, "help") // Alternative name // long_opt
+  add_arg(&opts, "m", .OPTIONAL_ARGUMENT, "my_flag_here")
 
 }
 getopt_long(os.args, &opts)
 // Parse opts:
 for opt in opts.opts {
-  if opt.set { // Check if its set to save non set options  
-    switch opt.name {
-      case "flag":
-        // Something
-      case "required":
-        // Something else 
-      case:
-        // default? Usage!
-    }
+  if ! opt.set do continue // allows to skip non set options.
+  switch opt.name { // name will always be set, don't have to check both
+    case "flag":
+      // Something
+    case "required":
+      // Something else 
+    case:
+      // default? Usage!
   }  
 }
 ```

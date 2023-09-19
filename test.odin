@@ -19,23 +19,22 @@ fake_do_thing :: proc(opt: Option) {
 
 fake_process_opts :: proc(opts: Options) {
 	for opt in opts.opts {
-		if opt.set {
-			switch opt.name { 	// This will always be set only need to check against name
-			case "t":
-				fake_do_thing(opt)
-			case "v":
-				fake_do_thing(opt)
-			case "w":
-				fake_do_thing(opt)
-			case "blue":
-				fake_do_thing(opt)
-			case "not-set":
-				fake_do_thing(opt)
-			case "red":
-				fake_do_thing(opt)
-			case:
-				fmt.println("Failure")
-			}
+		if !opt.set do continue
+		switch opt.name { 	// This will always be set only need to check against name
+		case "t":
+			fake_do_thing(opt)
+		case "v":
+			fake_do_thing(opt)
+		case "w":
+			fake_do_thing(opt)
+		case "blue":
+			fake_do_thing(opt)
+		case "not-set":
+			fake_do_thing(opt)
+		case "red":
+			fake_do_thing(opt)
+		case:
+			fmt.println("Failure")
 		}
 	}
 }

@@ -18,10 +18,11 @@ optarg_val :: union {
 }
 
 Option :: struct {
-	name:    string,
-	has_arg: optarg_opt,
-	val:     optarg_val,
-	set:     bool,
+	name:     string,
+	alt_name: string,
+	has_arg:  optarg_opt,
+	val:      optarg_val,
+	set:      bool,
 }
 
 Options :: struct {
@@ -53,9 +54,9 @@ deinit_opts :: proc(o: ^Options) {
 	delete(o.opts)
 }
 
-add_arg :: proc(o: ^Options, name: string, req: optarg_opt) {
+add_arg :: proc(o: ^Options, name: string, req: optarg_opt, alt_name: string = "") {
 	if o == nil || len(name) == 0 do os.exit(1)
-	append(&o.opts, Option{name, req, false, false})
+	append(&o.opts, Option{name, alt_name, req, false, false})
 	// TODO: Sus out some kind of option already exists check:
 	// for opt in o.opts {
 	// 	if str.compare(opt.name, name) == 0 {
@@ -90,9 +91,9 @@ getopt_long :: proc(args: []string, opts: ^Options) {
 		}
 
 		for &opt in opts.opts {
-			if str.compare(opt.name, arg) == 0 { 	// Found an argument!
+			if str.compare(opt.name, arg) == 0 || str.compare(opt.alt_name, arg) == 0 { 	// Found an argument!
 				using optarg_opt
-				// Do we need an argument?
+				// Do we need a value?
 				if opt.has_arg == .REQUIRED_ARGUMENT || opt.has_arg == .OPTIONAL_ARGUMENT {
 					if len(equals_val) == 0 {
 						if opt.has_arg == .REQUIRED_ARGUMENT && len(args) < i + 1 {

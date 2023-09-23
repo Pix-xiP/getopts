@@ -56,14 +56,18 @@ deinit_opts :: proc(o: ^Options) {
 
 add_arg :: proc(o: ^Options, name: string, req: optarg_opt, alt_name: string = "") {
 	if o == nil || len(name) == 0 do os.exit(1)
+	for opt in o.opts {
+		if str.compare(name, opt.name) == 0 || str.compare(name, opt.alt_name) == 0 {
+			fmt.fprintf(
+				os.stderr,
+				"%s: Option %v has already been added",
+				_progname(os.args[0]),
+				name,
+			)
+			os.exit(1)
+		}
+	}
 	append(&o.opts, Option{name, alt_name, req, false, false})
-	// TODO: Sus out some kind of option already exists check:
-	// for opt in o.opts {
-	// 	if str.compare(opt.name, name) == 0 {
-	// 		fmt.fprintf(os.stderr, "%s: Option already exists!", _progname(os.args[0]))
-	// 		os.exit(1)
-	// 	}
-	// }
 }
 
 getopt_long :: proc(args: []string, opts: ^Options) {

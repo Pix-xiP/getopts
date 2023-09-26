@@ -42,7 +42,6 @@ _progname :: proc(arg: string) -> string {
 	else do return arg
 }
 
-
 init_opts :: proc() -> Options {
 	return Options{opts = make([dynamic]Option)}
 }
@@ -110,7 +109,11 @@ getopt_long :: proc(args: []string, opts: ^Options) {
 							)
 							os.exit(1)
 						}
+						// Handle optional:
 						if len(args) < i + 1 {
+							opt.val = true
+						} else if str.has_prefix(args[i + 1], "-") {
+							// Handle the case of --flag --new_flag=10
 							opt.val = true
 						} else {
 							opt.val = str.clone(args[i + 1])

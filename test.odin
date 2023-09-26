@@ -1,13 +1,14 @@
 package getopts
 
 import "core:fmt"
+import "core:mem"
 import "core:os"
 import _t "core:testing"
 
 fake_do_thing :: proc(opt: Option) {
 	using optarg_opt
 	fmt.println("==================")
-	fmt.printf("   => %s/%s was set ", opt.name, opt.alt_name)
+	fmt.printf("   => '%s' / '%s' was set ", opt.name, opt.alt_name)
 	if opt.has_arg == .OPTIONAL_ARGUMENT {
 		fmt.printf("With optional value: %v\n", opt.val)
 	} else if opt.has_arg == .REQUIRED_ARGUMENT {
@@ -30,6 +31,8 @@ fake_process_opts :: proc(opts: Options) {
 		case "blue":
 			fake_do_thing(opt)
 		case "not-set":
+			fake_do_thing(opt)
+		case "opt-arg":
 			fake_do_thing(opt)
 		case "red":
 			fake_do_thing(opt)
@@ -70,12 +73,14 @@ test_getopts :: proc(_: ^_t.T) {
 		"Some stuff here",
 		"--blue=Steve",
 		"--red=Help",
+		"--opt-arg",
 		"-t",
 	}
 	opts := init_opts()
 	defer deinit_opts(&opts)
 	add_arg(&opts, "t", .NO_ARGUMENT, "tester")
 	add_arg(&opts, "v", .OPTIONAL_ARGUMENT, "vals")
+	add_arg(&opts, "opt-arg", .OPTIONAL_ARGUMENT)
 	add_arg(&opts, "w", .REQUIRED_ARGUMENT)
 	add_arg(&opts, "blue", .REQUIRED_ARGUMENT)
 	add_arg(&opts, "red", .REQUIRED_ARGUMENT, "red-ribbon")
@@ -83,6 +88,7 @@ test_getopts :: proc(_: ^_t.T) {
 
 	fmt.println("Options initialised and ready to parse")
 
+	fmt.println(args)
 	getopt_long(args, &opts)
 	fake_process_opts(opts)
 

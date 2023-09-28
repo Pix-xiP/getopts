@@ -82,7 +82,7 @@ getopt_long :: proc(args: []string, opts: ^Options) {
 		} else if str.has_prefix(args[i], "-") {
 			arg = args[i][1:]
 		} else {
-			fmt.fprintf(os.stderr, "%s: Invalid argument -- '%v'\n", _progname(args[0]), args[i])
+			fmt.fprintf(os.stderr, "%s: Invalid argument | '%v'\n", _progname(args[0]), args[i])
 			os.exit(1) // Don't accept args without '-'
 		}
 
@@ -109,11 +109,16 @@ getopt_long :: proc(args: []string, opts: ^Options) {
 							)
 							os.exit(1)
 						}
+
+						//FIXME: Broke this in my messing around, need to reconsider approach or 
+						//check what weird stuff I missed I think.
 						// Handle optional:
 						if len(args) < i + 1 {
 							opt.val = true
-						} else if str.has_prefix(args[i + 1], "-") {
+						} else if str.has_prefix(args[i + 1], "-") ||
+						   str.has_prefix(args[i + 1], "--") {
 							// Handle the case of --flag --new_flag=10
+							fmt.println("Setting arg", args[i], "to true")
 							opt.val = true
 						} else {
 							opt.val = str.clone(args[i + 1])
@@ -137,7 +142,7 @@ getopt_long :: proc(args: []string, opts: ^Options) {
 			}
 		}
 		if found != true {
-			fmt.println("%s: no argument -- %v", _progname(args[0]), arg)
+			fmt.println("%s: no argument | %v", _progname(args[0]), arg)
 			os.exit(1)
 		}
 		if len(has_equals) > 0 do delete(has_equals)

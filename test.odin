@@ -18,6 +18,19 @@ fake_do_thing :: proc(opt: Option) {
 	}
 }
 
+fake_print_help :: proc(opt: Option) {
+	fmt.printf("The %v flag was set with long opt %v\n")
+	fmt.printf("This is a fake usage message to simulate a help message\n")
+	fmt.printf(
+		` progname [OPTION] [VALUE] [FILEPATH]
+  - opt           Does some cool opt stuff
+  - arg           Does some cool arg stuff 
+  - f   -- file   Sets a cool filepath to use!
+`,
+	)
+
+}
+
 fake_process_opts :: proc(opts: Options) {
 	for opt in opts.opts {
 		if !opt.set do continue
@@ -35,6 +48,18 @@ fake_process_opts :: proc(opts: Options) {
 		case "opt-arg":
 			fake_do_thing(opt)
 		case "red":
+			fake_do_thing(opt)
+		case "h":
+			fake_print_help(opt)
+		case "f":
+			fake_do_thing(opt)
+		case "flag-two":
+			fake_do_thing(opt)
+		case "flag-three":
+			fake_do_thing(opt)
+		case "flag-four":
+			fake_do_thing(opt)
+		case "opt":
 			fake_do_thing(opt)
 		case:
 			fmt.println("Failure")
@@ -88,9 +113,47 @@ test_getopts :: proc(_: ^_t.T) {
 
 	fmt.println("Options initialised and ready to parse")
 
-	fmt.println(args)
 	getopt_long(args, &opts)
 	fake_process_opts(opts)
 
 	fmt.println("Done!")
+}
+
+@(test)
+test_optionals :: proc(_: ^_t.T) {
+	args: []string = {"./testopts", "--flag-one", "--flag-two", "pix-xip", "--opt-arg=1"}
+	opts := init_opts()
+	defer deinit_opts(&opts)
+	add_arg(&opts, "f", .OPTIONAL_ARGUMENT, "flag-one")
+	add_arg(&opts, "flag-two", .OPTIONAL_ARGUMENT)
+	add_arg(&opts, "opt", .OPTIONAL_ARGUMENT, "opt-arg")
+
+	fmt.println("Options initialised for optional argument test. Parsing")
+
+	getopt_long(args, &opts)
+	fake_process_opts(opts)
+	fmt.println("Done 'Optional' Test.")
+}
+
+@(test)
+test_required :: proc(_: ^_t.T) {
+	args: []string = {
+		"./testopts",
+		"-f",
+		"pix-xip",
+		"--flag-two",
+		"11911",
+		"-flag-three",
+		"path/to/file/for/flag/three",
+	}
+	opts := init_opts()
+	defer deinit_opts(&opts)
+	add_arg(&opts, "f", .REQUIRED_ARGUMENT, "flag-one")
+	add_arg(&opts, "flag-two", .REQUIRED_ARGUMENT)
+	add_arg(&opts, "flag-three", .REQUIRED_ARGUMENT, "f3bby")
+
+	fmt.println("Options initialised for required argument test. Paring")
+	getopt_long(args, &opts)
+	fake_process_opts(opts)
+	fmt.println("Done 'Required' Test")
 }
